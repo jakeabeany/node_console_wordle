@@ -6,7 +6,6 @@ const utils = require('./utils.js')
 // Select word based on date. 17/2/2022 is day 0, continuing up to the end
 const seed = utils.returnSeedFromDate(new Date(), words.length)
 const word = words[seed];
-console.log("word is", word)
 
 // Declare gameplay variables
 const MAX_GUESSES = 5;
@@ -25,9 +24,9 @@ do{
 
     // check game state
     if(victory){
-        console.log("You win. The word was", word, ".")
+        console.log("You win. The word was", word)
         GAME_OVER = true;
-    }else if(guesses.length === 5){
+    }else if(guesses.length === MAX_GUESSES){
         console.log("Too many guesses. You lose.")
         GAME_OVER = true;
     }
