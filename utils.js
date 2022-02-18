@@ -1,4 +1,5 @@
 const prompt = require('prompt-sync')();
+const chalk = require('chalk')
 
 const COLOURS = {
     Green: 'GREEN',
@@ -15,17 +16,17 @@ const COLOURS = {
 const evaluateGuess = (word, guess) => {
     const result = [];
     let occurences = trackOccurencesOfEachLetter(word)
-    const victory = false;
+    const hasWon = false;
 
-    if(word === guess){
-        return [[COLOURS.Green,COLOURS.Green,COLOURS.Green,COLOURS.Green,COLOURS.Green], !victory];
+    if (word === guess) {
+        return {result: new Array(5).fill(COLOURS.Green), hasWon: true};
     }
 
     // check for greens
     for (let i = 0; i < guess.length; i++) {
         if (word[i] === guess[i]) {
             result[i] = COLOURS.Green;
-            occurences = updateOccurences(occurences, guess[i]);
+            updateOccurences(occurences, guess[i]);
         }
     }
 
@@ -37,11 +38,12 @@ const evaluateGuess = (word, guess) => {
 
             if (guess[i] === word[j]) {
                 // guessed letter exists in the word in another position
-                // check if we can make it yellow by checking remaining occurences
-                if (occurences[guess[i].charCodeAt(0) - 97] > 0) {
-                    occurences = updateOccurences(occurences, guess[i]);
-                    result[i] = COLOURS.Yellow;
+                // check if we can make it yellow by checking remaining occurences                
+                if (occurences[guess[i].charCodeAt(0) - 97] > 0 && result[i] === undefined) {
+                    updateOccurences(occurences, guess[i]);
+                    result[i] = COLOURS.Yellow;                   
                 }
+                
             }
         }
     }
@@ -53,7 +55,7 @@ const evaluateGuess = (word, guess) => {
         }
     }
 
-    return [result, victory];
+    return {result: result, hasWon: false};
 }
 
 /**
@@ -76,8 +78,9 @@ const trackOccurencesOfEachLetter = (word) => {
  * @param {*} letter 
  * @returns 
  */
-const updateOccurences = (occurences, letter) => occurences[letter.charCodeAt(0) - 97]--;
-
+const updateOccurences = (occurences, letter) => {
+    occurences[letter.charCodeAt(0) - 97]--;
+}
 
 /**
  * returns the seed for a game. the seed is based on days since 17/2/22. so 18/2/22 = 1, 19/2/22 = 2, etc.
@@ -92,11 +95,11 @@ const returnSeedFromDate = (date, numWords) => {
     const MS_IN_ONE_DAY = 86400000;
 
     // time travellers to the past play the same game everytime
-    if(Math.abs(date) < zeroDate)
+    if (Math.abs(date) < zeroDate)
         return 0;
 
     const seed = Math.floor((currentDate - zeroDate) / MS_IN_ONE_DAY) % numWords;
-    
+
     return seed;
 }
 
@@ -107,17 +110,35 @@ const returnSeedFromDate = (date, numWords) => {
  * @returns 
  */
 const validateGuess = (guess, words) => {
-    if(words.includes(guess.toLowerCase())){
+    if (words.includes(guess.toLowerCase())) {
         // valid word
         return guess;
-    }else{
+    } else {
         return validateGuess(prompt("Enter your guess: "), words);
     }
 }
 
+const chalkColourMap = {
+    [COLOURS.Green]: chalk.bgGreen,
+    [COLOURS.Yellow]: chalk.bgYellow,
+    [COLOURS.Grey]: chalk.bgGray,
+}
+
+const returnChalkColour = (colour) => chalkColourMap[colour]
+
+const printResultToConsole = (result, guess) => {
+    const lineToPrint = [];
+    for (let i = 0; i < guess.length; i++) {
+        lineToPrint.push(returnChalkColour(result[i])(` ${guess[i]} `))
+    }
+
+    console.log(lineToPrint.toString().replaceAll(',', ' '))
+}
+
+
 module.exports = {
     evaluateGuess: evaluateGuess,
-    trackOccurencesOfEachLetter: trackOccurencesOfEachLetter,
     returnSeedFromDate: returnSeedFromDate,
-    validateGuess: validateGuess
+    validateGuess: validateGuess,
+    printResultToConsole: printResultToConsole
 }
