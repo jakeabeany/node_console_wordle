@@ -1,86 +1,5 @@
-const prompt = require('prompt-sync')();
 const chalk = require('chalk')
-
-const COLOURS = {
-    Green: 'GREEN',
-    Yellow: 'YELLOW',
-    Grey: 'GREY'
-}
-
-/**
- * Function to take in (word, guess) and return a result string.
- * @param {*} word  The current word in play
- * @param {*} guess The users guess    
- * @returns a array of the results. e.g, correct answer = [GREEN,GREEN,GREEN,GREEN,GREEN]. completely wrong = [GREY,GREY,GREY,GREY,GREY].
- */
-const evaluateGuess = (word, guess) => {
-    const result = [];
-    let occurences = trackOccurencesOfEachLetter(word)
-    const hasWon = false;
-
-    if (word === guess) {
-        return {result: new Array(5).fill(COLOURS.Green), hasWon: true};
-    }
-
-    // check for greens
-    for (let i = 0; i < guess.length; i++) {
-        if (word[i] === guess[i]) {
-            result[i] = COLOURS.Green;
-            updateOccurences(occurences, guess[i]);
-        }
-    }
-
-    // check for yellows
-    for (let i = 0; i < guess.length; i++) {
-        for (let j = 0; j < word.length; j++) {
-            // dont compare letters in the same position, that's already done
-            if (i === j) continue
-
-            if (guess[i] === word[j]) {
-                // guessed letter exists in the word in another position
-                // check if we can make it yellow by checking remaining occurences                
-                if (occurences[guess[i].charCodeAt(0) - 97] > 0 && result[i] === undefined) {
-                    updateOccurences(occurences, guess[i]);
-                    result[i] = COLOURS.Yellow;                   
-                }
-                
-            }
-        }
-    }
-
-    // fill greys
-    for (let i = 0; i < guess.length; i++) {
-        if (result[i] === undefined) {
-            result[i] = COLOURS.Grey;
-        }
-    }
-
-    return {result: result, hasWon: false};
-}
-
-/**
- * track the count of each letter in the word, used for ensuring correct amount of yellows
- * @param {*} word 
- * @returns 
- */
-const trackOccurencesOfEachLetter = (word) => {
-    // 'a' has a charCode of 97. so here we use (charCode - 97) to index characters
-    const occurences = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // dont be mad at this
-    for (let i = 0; i < word.length; i++) {
-        occurences[word[i].charCodeAt(0) - 97]++;
-    }
-    return occurences;
-}
-
-/**
- * decrement the count of the passed-in letter
- * @param {*} occurences 
- * @param {*} letter 
- * @returns 
- */
-const updateOccurences = (occurences, letter) => {
-    occurences[letter.charCodeAt(0) - 97]--;
-}
+const gameLogic = require('./gamelogic.js');
 
 /**
  * returns the seed for a game. the seed is based on days since 17/2/22. so 18/2/22 = 1, 19/2/22 = 2, etc.
@@ -103,25 +22,10 @@ const returnSeedFromDate = (date, numWords) => {
     return seed;
 }
 
-/**
- * only accept guesses that are in the list of words
- * @param {*} guess 
- * @param {*} words 
- * @returns 
- */
-const validateGuess = (guess, words) => {
-    if (words.includes(guess.toLowerCase())) {
-        // valid word
-        return guess;
-    } else {
-        return validateGuess(prompt("Enter your guess: "), words);
-    }
-}
-
 const chalkColourMap = {
-    [COLOURS.Green]: chalk.bgGreen,
-    [COLOURS.Yellow]: chalk.bgYellow,
-    [COLOURS.Grey]: chalk.bgGray,
+    [gameLogic.COLOURS.Green]: chalk.bgGreen,
+    [gameLogic.COLOURS.Yellow]: chalk.bgYellow,
+    [gameLogic.COLOURS.Grey]: chalk.bgGray,
 }
 
 const returnChalkColour = (colour) => chalkColourMap[colour]
@@ -137,8 +41,6 @@ const printResultToConsole = (result, guess) => {
 
 
 module.exports = {
-    evaluateGuess: evaluateGuess,
-    returnSeedFromDate: returnSeedFromDate,
-    validateGuess: validateGuess,
-    printResultToConsole: printResultToConsole
+    returnSeedFromDate,
+    printResultToConsole
 }

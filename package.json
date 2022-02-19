@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node --experimental-modules index.js"
   },
   "author": "",
@@ -12,6 +12,7 @@
   "dependencies": {
     "blob": "^0.1.0",
     "chalk": "^4.0.0",
+    "jest": "^27.5.1",
     "prompt-sync": "^4.2.0",
     "yargs": "^17.3.1"
   }
