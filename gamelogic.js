@@ -107,5 +107,7 @@ const updateOccurences = (occurences, letter) => {
 module.exports = {
     evaluateGuess,
     validateGuess,
+    trackOccurencesOfEachLetter,
+    updateOccurences,
     COLOURS
 }

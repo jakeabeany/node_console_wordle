@@ -1,23 +1,20 @@
-const utils = require('C:/Users/44791/Documents/Code_Projects/npm_wordle/utils.js')
+const utils = require('../utils.js')
+const words = require('../available_words.json');
 
-test('counts letters in aaaaa, should be 26-element array with 5 in first entry, 0s elsewhere', () => { 
-    const expectedOutput = Array(26).fill(0);
-    expectedOutput[0] = 5;
-
-    expect(utils.trackOccurencesOfEachLetter('aaaaa')).toStrictEqual(expectedOutput)
+test('should return 0 because 2022-2-17 was entered', () => { 
+    const expectedOutput = 0;
+    const result = utils.returnSeedFromDate(new Date("2022-2-17"), words.length);
+    expect(result).toBe(expectedOutput);
  })
 
- test('decrements array that counts occurences of letters in a word when letter is passed in', () => { 
-     const occurences = utils.trackOccurencesOfEachLetter('abcde');
-     const expectedOutput = occurences;
-     expectedOutput[2] = 0;
-     
-     utils.updateOccurences(occurences, 'c')
+ test('should return 0 because 1999-2-16 was entered. everything before 1999-2-17 should be 0', () => { 
+    const expectedOutput = 0;
+    const result = utils.returnSeedFromDate(new Date("1999-2-17"), words.length);
+    expect(result).toBe(expectedOutput);
+ })
 
-     expect(occurences).toStrictEqual(expectedOutput)
-  })
-
-  test('should return 0 when 17/2/22 date is passed as arguement', () => { 
-      const NUM_WORDS = 5000; // required argument that references size of words.json file. no relevant here
-      expect(utils.returnSeedFromDate(new Date("2022-2-17"), NUM_WORDS)).toBe(0) 
-   })
+ test('should return 0 because 2022-2-18 was entered', () => { 
+    const expectedOutput = 1;
+    const result = utils.returnSeedFromDate(new Date("2022-2-18"), words.length);
+    expect(result).toBe(expectedOutput);
+ })
